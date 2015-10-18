@@ -11,6 +11,7 @@ import br.ufc.arida.bcl.sd20152.atividadermi.lib.Mensagem;
 import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -87,6 +88,10 @@ public class AplicacaoCliente extends javax.swing.JFrame {
         chatClienteController.sairDoChat();
     }
     
+    public void limparAreaDeConversa() {
+        jTextArea1.setText("");
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -108,6 +113,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         exitMenuItem = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
 
@@ -183,6 +189,15 @@ public class AplicacaoCliente extends javax.swing.JFrame {
         menuBar.add(fileMenu);
 
         jMenu1.setText("Editar");
+
+        jMenuItem3.setText("Limpar Tela de Conversa");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem3);
+
         menuBar.add(jMenu1);
 
         helpMenu.setMnemonic('h');
@@ -190,6 +205,11 @@ public class AplicacaoCliente extends javax.swing.JFrame {
 
         aboutMenuItem.setMnemonic('a');
         aboutMenuItem.setText("About");
+        aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutMenuItemActionPerformed(evt);
+            }
+        });
         helpMenu.add(aboutMenuItem);
 
         menuBar.add(helpMenu);
@@ -226,7 +246,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-        desconectarDoChat();
+        //desconectarDoChat();
         System.exit(0);
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
@@ -243,6 +263,19 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         desconectarDoChat();
     }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        limparAreaDeConversa();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
+        String sobre = "UFC"
+                + "\nMDCC"
+                + "\nSistemas Distribuídos e Redes de Computadores - 2015-2"
+                + "\nAtividade RMI - Aplicacao Servidor"
+                + "\nAutor: Bruno Leal";
+        JOptionPane.showMessageDialog(this, sobre);
+    }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -287,6 +320,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPopupMenu.Separator jSeparator1;

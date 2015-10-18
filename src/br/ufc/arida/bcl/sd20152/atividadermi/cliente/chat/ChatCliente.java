@@ -42,13 +42,13 @@ public class ChatCliente {
     }
 
     protected synchronized List<String> getMensagensDeLog() {
-        List<String> listaDeLogs = new ArrayList<>(getMensagensDeLog());
+        List<String> listaDeLogs = new ArrayList<>(mensagensDeLog);
         return listaDeLogs;
     }
     
     protected void adicionarRegistroDeLog(String registroDeLog) {
         String log = "#" + registroDeLog;
-        getMensagensDeLog().add(log);
+        mensagensDeLog.add(log);
         System.out.println(log);
     }
 
