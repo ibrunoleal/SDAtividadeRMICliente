@@ -272,7 +272,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
         String sobre = "UFC"
                 + "\nMDCC"
                 + "\nSistemas Distribuídos e Redes de Computadores - 2015-2"
-                + "\nAtividade RMI - Aplicacao Servidor"
+                + "\nAtividade RMI - Aplicacao Cliente"
                 + "\nAutor: Bruno Leal";
         JOptionPane.showMessageDialog(this, sobre);
     }//GEN-LAST:event_aboutMenuItemActionPerformed
