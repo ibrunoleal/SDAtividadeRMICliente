@@ -6,7 +6,7 @@
 package br.ufc.arida.bcl.sd20152.atividadermi.cliente.gui;
 
 import br.ufc.arida.bcl.sd20152.atividadermi.cliente.chat.ChatCliente;
-import br.ufc.arida.bcl.sd20152.atividadermi.cliente.chat.ServidorDeCliente;
+import br.ufc.arida.bcl.sd20152.atividadermi.cliente.chat.ChatClienteController;
 import br.ufc.arida.bcl.sd20152.atividadermi.lib.Mensagem;
 import java.rmi.RemoteException;
 import java.util.logging.Level;
@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class AplicacaoCliente extends javax.swing.JFrame {
     
-    private ServidorDeCliente servidorDeCliente;
+    private ChatClienteController chatClienteController;
     
     private int contadorDeMensagensDeLog;
     
@@ -29,32 +29,38 @@ public class AplicacaoCliente extends javax.swing.JFrame {
      */
     public AplicacaoCliente() {
         initComponents();
+
+        try {
+            chatClienteController = new ChatClienteController();;
+        } catch (RemoteException ex) {
+            Logger.getLogger(AplicacaoCliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
-        servidorDeCliente = new ServidorDeCliente();
         contadorDeMensagensDeLog = 0;
         contadorDeMensagens = 0;
     }
 
     public void entrarNoChat() {
-        servidorDeCliente.entrarNoChat();
+        chatClienteController.entrarNoChat();
         threadAtualizador.start();
     }
     
     public void enviarMensagem(String msg) {
-        servidorDeCliente.enviarMensagem(msg);
+        chatClienteController.enviarMensagem(msg);
     }
     
     public void atualizarTelaDeMensagens() {
-        int cont = servidorDeCliente.getMensagensDeLog().size();
-        while (contadorDeMensagensDeLog < cont) {
-            jTextArea1.append(servidorDeCliente.getMensagensDeLog().get(contadorDeMensagensDeLog) + "\n");
+        
+        int contLogTemp = chatClienteController.getMensagensDeLog().size();
+        while (contadorDeMensagensDeLog < contLogTemp) {
+            jTextArea1.append(chatClienteController.getMensagensDeLog().get(contadorDeMensagensDeLog) + "\n");
             contadorDeMensagensDeLog++;
         }
         
-        int cont2 = servidorDeCliente.getCaixaDeEntrada().size();
-        while (contadorDeMensagens < cont2) {
-            Mensagem m = servidorDeCliente.getCaixaDeEntrada().get(contadorDeMensagens);
-            jTextArea1.append(servidorDeCliente.mensagemToString(m) + "\n");
+        int contMsgsTemp = chatClienteController.getCaixaDeEntrada().size();
+        while (contadorDeMensagens < contMsgsTemp) {
+            Mensagem m = chatClienteController.getCaixaDeEntrada().get(contadorDeMensagens);
+            jTextArea1.append(chatClienteController.mensagemToString(m) + "\n");
             contadorDeMensagens++;
         }
     }
@@ -78,7 +84,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     };
     
     public void desconectarDoChat() {
-        servidorDeCliente.sairDoChat();
+        chatClienteController.sairDoChat();
     }
     
     /**
@@ -197,7 +203,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 797, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
                     .addComponent(jTextField1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -212,7 +218,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
                         .addComponent(jScrollPane1)
                         .addGap(18, 18, 18)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 407, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -220,7 +226,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-        servidorDeCliente.sairDoChat();
+        desconectarDoChat();
         System.exit(0);
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
@@ -235,7 +241,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        servidorDeCliente.sairDoChat();
+        desconectarDoChat();
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
