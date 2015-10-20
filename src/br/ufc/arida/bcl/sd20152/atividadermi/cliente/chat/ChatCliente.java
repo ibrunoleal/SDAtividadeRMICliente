@@ -24,8 +24,11 @@ public class ChatCliente {
         mensagensDeLog = new ArrayList<String>();
     }
 
-    protected void receberMensagem(Mensagem mensagem) {
-        caixaDeEntrada.add(mensagem);
+    protected boolean receberMensagem(Mensagem mensagem) {
+        if (caixaDeEntrada.add(mensagem)) {
+            return true;
+        }
+        return false;
     }
 
     protected String getNickname() {

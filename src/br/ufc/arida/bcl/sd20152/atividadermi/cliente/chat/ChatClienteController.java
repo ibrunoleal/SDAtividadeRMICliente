@@ -13,6 +13,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,7 +64,13 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
 
         try {
             chatCliente.setNickname(nick);
-            servidor.adicionarCliente(this, nick);
+            if (servidor.adicionarCliente(this, nick)) {
+                log = "adicionado com sucesso da lista de subscribers do chat.";
+                chatCliente.adicionarRegistroDeLog(log);
+            } else {
+                log = "erro ao tentar entrar na lista de subscribers do chat.";
+                chatCliente.adicionarRegistroDeLog(log);
+            }
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -71,8 +78,8 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     }
 
     @Override
-    public void receberMensagem(Mensagem mensagem) throws RemoteException {
-        chatCliente.receberMensagem(mensagem);
+    public boolean receberMensagem(Mensagem mensagem) throws RemoteException {
+        return chatCliente.receberMensagem(mensagem);
     }
     
     public void enviarMensagem(Mensagem mensagem) {
@@ -93,14 +100,31 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     public void sairDoChat() {
         String log;
         try {
-            servidor.removerCliente(this);
-            log = "enviado pedido de remocao da lista de subscribers do chat.";
-            chatCliente.adicionarRegistroDeLog(log);
+            if (servidor.removerCliente(this)) {
+                log = "removido com sucesso da lista de subscribers do chat.";
+                chatCliente.adicionarRegistroDeLog(log);
+            } else {
+                log = "erro: nao foi removido da lista de subscribers do chat.";
+                chatCliente.adicionarRegistroDeLog(log);
+            }
         } catch (RemoteException ex) {
             log = "falha ao enviar pedido de remocao da lista de subscribers do chat.";
             chatCliente.adicionarRegistroDeLog(log);
             Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public List<String> getListaDeNicknameDosUsuarios() {
+        List<String> lista;
+        try {
+            lista = new ArrayList<>(servidor.getNicknamesDosUsuarios());
+            return lista;
+        } catch (RemoteException ex) {
+            String log = "nao foi possivel recuperar a lista de nickname dos subscribers do chat.";
+            chatCliente.adicionarRegistroDeLog(log);
+            Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
     public List<Mensagem> getCaixaDeEntrada() {
@@ -113,6 +137,15 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
 
     public String mensagemToString(Mensagem m) {
         return "<" + m.getId() + ">-<" + m.getNickname() + ">:" + m.getConteudo();
+    }
+
+    public boolean isUsuarioNaListaDeUsuarios(String nicktemp) {
+        for (String nick : getListaDeNicknameDosUsuarios()) {
+            if (nick.equalsIgnoreCase(nicktemp)) {
+                return true;
+            }
+        }
+        return false;
     }
     
 }

@@ -12,6 +12,7 @@ import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -66,6 +67,32 @@ public class AplicacaoCliente extends javax.swing.JFrame {
         }
     }
     
+    public void atualizarTabelaDeUsuarios() {
+        /*
+         atualiza a lista de usuarios conectados no sentido da lista de usuarios para a tabela:
+         adiciona os que conectaram
+         */
+        DefaultTableModel modeloDeTabelaUsuarios = (DefaultTableModel) jTable1.getModel();
+        for (int i = 0; i < chatClienteController.getListaDeNicknameDosUsuarios().size(); i++) {
+            String nicktemp = chatClienteController.getListaDeNicknameDosUsuarios().get(i);
+            if (!isNickNaTabela(nicktemp)) {
+                modeloDeTabelaUsuarios.addRow(new Object[]{nicktemp});
+            }
+        }
+
+        /*
+         atualiza a lista de usuarios conectados no sentido da tabela para a lista de usuarios:
+         remove os que desconectaram.
+         */
+        DefaultTableModel modeloDeTabelaUsuarios2 = (DefaultTableModel) jTable1.getModel();
+        for (int i = 0; i < modeloDeTabelaUsuarios2.getRowCount(); i++) {
+            String nicktemp = modeloDeTabelaUsuarios2.getValueAt(i, 0).toString();
+            if (!chatClienteController.isUsuarioNaListaDeUsuarios(nicktemp)) {
+                modeloDeTabelaUsuarios2.removeRow(i);
+            }
+        }
+    }
+    
     Thread threadAtualizador = new Thread() {
 
         @Override
@@ -75,6 +102,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
                  atualiza as mensagens de log
                  */
                 atualizarTelaDeMensagens();
+                atualizarTabelaDeUsuarios();
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
@@ -90,6 +118,30 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     
     public void limparAreaDeConversa() {
         jTextArea1.setText("");
+    }
+    
+    private boolean isNickNaTabela(String nicktemp) {
+        for (int i = 0; i < jTable1.getRowCount(); i++) {
+            if (nicktemp.equalsIgnoreCase(jTable1.getModel().getValueAt(i, 0).toString())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void enviarMensagem() {
+        String texto = jTextField1.getText();
+        enviarMensagem(texto);
+        jTextField1.setText("");
+    }
+    
+    private void exibirTelaSobre() {
+        String sobre = "UFC"
+                + "\nMDCC"
+                + "\nSistemas Distribuídos e Redes de Computadores - 2015-2"
+                + "\nAtividade RMI - Aplicacao Cliente"
+                + "\nAutor: Bruno Leal";
+        JOptionPane.showMessageDialog(this, sobre);
     }
     
     /**
@@ -146,6 +198,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
             jTable1.getColumnModel().getColumn(0).setResizable(false);
@@ -255,9 +308,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        String texto = jTextField1.getText();
-        enviarMensagem(texto);
-        jTextField1.setText("");
+        enviarMensagem();
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
@@ -269,12 +320,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
-        String sobre = "UFC"
-                + "\nMDCC"
-                + "\nSistemas Distribuídos e Redes de Computadores - 2015-2"
-                + "\nAtividade RMI - Aplicacao Cliente"
-                + "\nAutor: Bruno Leal";
-        JOptionPane.showMessageDialog(this, sobre);
+        exibirTelaSobre();
     }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     /**
@@ -329,5 +375,5 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField1;
     private javax.swing.JMenuBar menuBar;
     // End of variables declaration//GEN-END:variables
-
+ 
 }
