@@ -68,6 +68,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     }
     
     public void atualizarTabelaDeUsuarios() {
+        String log;
         /*
          atualiza a lista de usuarios conectados no sentido da lista de usuarios para a tabela:
          adiciona os que conectaram
@@ -77,6 +78,8 @@ public class AplicacaoCliente extends javax.swing.JFrame {
             String nicktemp = chatClienteController.getListaDeNicknameDosUsuarios().get(i);
             if (!isNickNaTabela(nicktemp)) {
                 modeloDeTabelaUsuarios.addRow(new Object[]{nicktemp});
+                log = "usuario " + nicktemp + "entrou no chat.";
+                chatClienteController.adicionarRegistroDeLog(log);
             }
         }
 
@@ -89,6 +92,8 @@ public class AplicacaoCliente extends javax.swing.JFrame {
             String nicktemp = modeloDeTabelaUsuarios2.getValueAt(i, 0).toString();
             if (!chatClienteController.isUsuarioNaListaDeUsuarios(nicktemp)) {
                 modeloDeTabelaUsuarios2.removeRow(i);
+                log = "usuario " + nicktemp + "saiu no chat.";
+                chatClienteController.adicionarRegistroDeLog(log);
             }
         }
     }

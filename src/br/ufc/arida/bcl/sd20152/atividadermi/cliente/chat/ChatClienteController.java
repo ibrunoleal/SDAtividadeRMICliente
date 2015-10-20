@@ -41,20 +41,20 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
         try {
             log = "registrando...";
             registroCliente = LocateRegistry.getRegistry(1099);
-            chatCliente.adicionarRegistroDeLog(log);
+            adicionarRegistroDeLog(log);
         } catch (RemoteException e) {
             log = "erro: servidor nao encontrado para registro";
-            chatCliente.adicionarRegistroDeLog(log);
+            adicionarRegistroDeLog(log);
             e.printStackTrace();
             //System.exit(1);
         }
 
         try {
             log = "criando interface de comunicacao remota";
-            chatCliente.adicionarRegistroDeLog(log);
+            adicionarRegistroDeLog(log);
             servidor = (InterfaceDeServidor)registroCliente.lookup(InterfaceDeServidor.ID_DO_CHAT_RMI);
             log = "interface de comunicacao remota criada";
-            chatCliente.adicionarRegistroDeLog(log);
+            adicionarRegistroDeLog(log);
         } catch (RemoteException | NotBoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -66,10 +66,10 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
             chatCliente.setNickname(nick);
             if (servidor.adicionarCliente(this, nick)) {
                 log = "adicionado com sucesso da lista de subscribers do chat.";
-                chatCliente.adicionarRegistroDeLog(log);
+                adicionarRegistroDeLog(log);
             } else {
                 log = "erro ao tentar entrar na lista de subscribers do chat.";
-                chatCliente.adicionarRegistroDeLog(log);
+                adicionarRegistroDeLog(log);
             }
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
@@ -87,7 +87,7 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
             servidor.enviarMensagem(mensagem);
         } catch (RemoteException ex) {
             String log = "Nao foi possivel enviar a mensagem.";
-            chatCliente.adicionarRegistroDeLog(log);
+            adicionarRegistroDeLog(log);
             Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -102,10 +102,10 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
         try {
             if (servidor.removerCliente(this)) {
                 log = "removido com sucesso da lista de subscribers do chat.";
-                chatCliente.adicionarRegistroDeLog(log);
+                adicionarRegistroDeLog(log);
             } else {
                 log = "erro: nao foi removido da lista de subscribers do chat.";
-                chatCliente.adicionarRegistroDeLog(log);
+                adicionarRegistroDeLog(log);
             }
         } catch (RemoteException ex) {
             log = "falha ao enviar pedido de remocao da lista de subscribers do chat.";
@@ -121,7 +121,7 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
             return lista;
         } catch (RemoteException ex) {
             String log = "nao foi possivel recuperar a lista de nickname dos subscribers do chat.";
-            chatCliente.adicionarRegistroDeLog(log);
+            adicionarRegistroDeLog(log);
             Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
@@ -146,6 +146,10 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
             }
         }
         return false;
+    }
+    
+    public void adicionarRegistroDeLog(String registroDeLog) {
+        chatCliente.adicionarRegistroDeLog(registroDeLog);
     }
     
 }
