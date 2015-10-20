@@ -33,47 +33,54 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     
     public ChatClienteController() throws RemoteException{
         chatCliente = new ChatCliente();
+        registroCliente = null;
+        servidor = null;
     }
     
     public void entrarNoChat() {
         String log;
-        
-        try {
-            log = "registrando...";
-            registroCliente = LocateRegistry.getRegistry(1099);
-            adicionarRegistroDeLog(log);
-        } catch (RemoteException e) {
-            log = "erro: servidor nao encontrado para registro";
-            adicionarRegistroDeLog(log);
-            e.printStackTrace();
-            //System.exit(1);
-        }
+        if (!isConectado()) {
 
-        try {
-            log = "criando interface de comunicacao remota";
-            adicionarRegistroDeLog(log);
-            servidor = (InterfaceDeServidor)registroCliente.lookup(InterfaceDeServidor.ID_DO_CHAT_RMI);
-            log = "interface de comunicacao remota criada";
-            adicionarRegistroDeLog(log);
-        } catch (RemoteException | NotBoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        String nick = JOptionPane.showInputDialog("Digite um nickname para utilizar no chat:");
-
-        try {
-            chatCliente.setNickname(nick);
-            if (servidor.adicionarCliente(this, nick)) {
-                log = "adicionado com sucesso da lista de subscribers do chat.";
+            try {
+                log = "registrando...";
+                registroCliente = LocateRegistry.getRegistry(InterfaceDeServidor.IP_DO_SERVIDOR, 1099);
                 adicionarRegistroDeLog(log);
-            } else {
-                log = "erro ao tentar entrar na lista de subscribers do chat.";
+            } catch (RemoteException e) {
+                log = "erro: servidor nao encontrado para registro";
                 adicionarRegistroDeLog(log);
+                e.printStackTrace();
+                //System.exit(1);
             }
-        } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+            try {
+                log = "criando interface de comunicacao remota";
+                adicionarRegistroDeLog(log);
+                servidor = (InterfaceDeServidor) registroCliente.lookup(InterfaceDeServidor.ID_DO_CHAT_RMI);
+                log = "interface de comunicacao remota criada";
+                adicionarRegistroDeLog(log);
+            } catch (RemoteException | NotBoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            String nick = JOptionPane.showInputDialog("Digite um nickname para utilizar no chat:");
+
+            try {
+                chatCliente.setNickname(nick);
+                if (servidor.adicionarCliente(this, nick)) {
+                    log = "adicionado com sucesso da lista de subscribers do chat.";
+                    adicionarRegistroDeLog(log);
+                } else {
+                    log = "erro ao tentar entrar na lista de subscribers do chat.";
+                    adicionarRegistroDeLog(log);
+                }
+            } catch (RemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            log = "operacao nao permitida: ja esta conectado";
+            adicionarRegistroDeLog(log);
         }
     }
 
@@ -83,12 +90,18 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     }
     
     public void enviarMensagem(Mensagem mensagem) {
-        try {
-            servidor.enviarMensagem(mensagem);
-        } catch (RemoteException ex) {
-            String log = "Nao foi possivel enviar a mensagem.";
+        String log;
+        if (isConectado()) {
+            try {
+                servidor.enviarMensagem(mensagem);
+            } catch (RemoteException ex) {
+                log = "Nao foi possivel enviar a mensagem.";
+                adicionarRegistroDeLog(log);
+                Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            log = "operacao nao permitida: nao esta conectado";
             adicionarRegistroDeLog(log);
-            Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -99,32 +112,45 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     
     public void sairDoChat() {
         String log;
-        try {
-            if (servidor.removerCliente(this)) {
-                log = "removido com sucesso da lista de subscribers do chat.";
-                adicionarRegistroDeLog(log);
-            } else {
-                log = "erro: nao foi removido da lista de subscribers do chat.";
-                adicionarRegistroDeLog(log);
+        if (isConectado()) {
+            try {
+                if (servidor.removerCliente(this)) {
+                    log = "removido com sucesso da lista de subscribers do chat.";
+                    adicionarRegistroDeLog(log);
+                } else {
+                    log = "erro: nao foi removido da lista de subscribers do chat.";
+                    adicionarRegistroDeLog(log);
+                }
+            } catch (RemoteException ex) {
+                log = "falha ao enviar pedido de remocao da lista de subscribers do chat.";
+                chatCliente.adicionarRegistroDeLog(log);
+                Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                desconectarServidor();
             }
-        } catch (RemoteException ex) {
-            log = "falha ao enviar pedido de remocao da lista de subscribers do chat.";
-            chatCliente.adicionarRegistroDeLog(log);
-            Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            log = "operacao nao permitida: nao esta conectado";
+            adicionarRegistroDeLog(log);
         }
     }
     
     public List<String> getListaDeNicknameDosUsuarios() {
-        List<String> lista;
-        try {
-            lista = new ArrayList<>(servidor.getNicknamesDosUsuarios());
-            return lista;
-        } catch (RemoteException ex) {
-            String log = "nao foi possivel recuperar a lista de nickname dos subscribers do chat.";
+        if (isConectado()) {
+            List<String> lista;
+            try {
+                lista = new ArrayList<>(servidor.getNicknamesDosUsuarios());
+                return lista;
+            } catch (RemoteException ex) {
+                String log = "nao foi possivel recuperar a lista de nickname dos subscribers do chat.";
+                adicionarRegistroDeLog(log);
+                Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return null;
+        } else {
+            String log = "operacao nao permitida - getListaDeNicknameDosUsuarios(): nao esta conectado";
             adicionarRegistroDeLog(log);
-            Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         }
-        return null;
     }
     
     public List<Mensagem> getCaixaDeEntrada() {
@@ -150,6 +176,26 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     
     public void adicionarRegistroDeLog(String registroDeLog) {
         chatCliente.adicionarRegistroDeLog(registroDeLog);
+    }
+    
+    public void desconectarServidor() {
+        if (registroCliente != null) {
+            registroCliente = null;
+        }
+        if (servidor != null) {
+            servidor = null;
+        }
+        String log = "finalizada a comunicacao com o servidor. "
+                + "Para enviar mensagens se conecte novamente";
+        adicionarRegistroDeLog(log);
+    }
+    
+    public boolean isConectado() {
+        if (registroCliente != null && servidor != null) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
 }

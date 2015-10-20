@@ -5,7 +5,6 @@
  */
 package br.ufc.arida.bcl.sd20152.atividadermi.cliente.gui;
 
-import br.ufc.arida.bcl.sd20152.atividadermi.cliente.chat.ChatCliente;
 import br.ufc.arida.bcl.sd20152.atividadermi.cliente.chat.ChatClienteController;
 import br.ufc.arida.bcl.sd20152.atividadermi.lib.Mensagem;
 import java.rmi.RemoteException;
@@ -33,7 +32,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
         initComponents();
 
         try {
-            chatClienteController = new ChatClienteController();;
+            chatClienteController = new ChatClienteController();
         } catch (RemoteException ex) {
             Logger.getLogger(AplicacaoCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -78,7 +77,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
             String nicktemp = chatClienteController.getListaDeNicknameDosUsuarios().get(i);
             if (!isNickNaTabela(nicktemp)) {
                 modeloDeTabelaUsuarios.addRow(new Object[]{nicktemp});
-                log = "usuario " + nicktemp + "entrou no chat.";
+                log = "usuario " + nicktemp + " entrou no chat.";
                 chatClienteController.adicionarRegistroDeLog(log);
             }
         }
@@ -92,7 +91,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
             String nicktemp = modeloDeTabelaUsuarios2.getValueAt(i, 0).toString();
             if (!chatClienteController.isUsuarioNaListaDeUsuarios(nicktemp)) {
                 modeloDeTabelaUsuarios2.removeRow(i);
-                log = "usuario " + nicktemp + "saiu no chat.";
+                log = "usuario " + nicktemp + " saiu no chat.";
                 chatClienteController.adicionarRegistroDeLog(log);
             }
         }
@@ -119,10 +118,18 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     
     public void desconectarDoChat() {
         chatClienteController.sairDoChat();
+        limparTabelaDeUsuarios();
     }
     
     public void limparAreaDeConversa() {
         jTextArea1.setText("");
+    }
+    
+    public void limparTabelaDeUsuarios() {
+        DefaultTableModel modeloDeTabelaUsuarios = (DefaultTableModel) jTable1.getModel();
+        while(modeloDeTabelaUsuarios.getRowCount() > 0) {
+            modeloDeTabelaUsuarios.removeRow(0);
+        }
     }
     
     private boolean isNickNaTabela(String nicktemp) {
@@ -304,7 +311,9 @@ public class AplicacaoCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-        //desconectarDoChat();
+        if (chatClienteController.isConectado()) {
+            desconectarDoChat();
+        }
         System.exit(0);
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
