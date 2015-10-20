@@ -25,7 +25,7 @@ import javax.swing.JOptionPane;
  */
 public class ChatClienteController  extends UnicastRemoteObject implements InterfaceDeCliente {
     
-    private Registry registroCliente = null;
+    private Registry registroCliente;
     
     ChatCliente chatCliente;
     
@@ -40,7 +40,7 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     public void entrarNoChat() {
         String log;
         if (!isConectado()) {
-
+           
             try {
                 log = "registrando...";
                 registroCliente = LocateRegistry.getRegistry(InterfaceDeServidor.IP_DO_SERVIDOR, 1099);
@@ -80,7 +80,7 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
             }
         } else {
             log = "operacao nao permitida: ja esta conectado";
-            adicionarRegistroDeLog(log);
+            chatCliente.adicionarRegistroDeLog(log);
         }
     }
 

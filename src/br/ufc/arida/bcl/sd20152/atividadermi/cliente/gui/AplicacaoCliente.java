@@ -43,7 +43,14 @@ public class AplicacaoCliente extends javax.swing.JFrame {
 
     public void entrarNoChat() {
         chatClienteController.entrarNoChat();
-        threadAtualizador.start();
+        try {
+            threadAtualizador.start();
+        } catch (IllegalThreadStateException e) {
+            /*
+            captura o erro se a thread já esta iniciada, se o usuario tentou conectar novamente.
+            */
+            //nao precisa fazer nada
+        }
     }
     
     public void enviarMensagem(String msg) {
@@ -102,15 +109,19 @@ public class AplicacaoCliente extends javax.swing.JFrame {
         @Override
         public void run() {
             while (true) {
-                /*
-                 atualiza as mensagens de log
-                 */
-                atualizarTelaDeMensagens();
-                atualizarTabelaDeUsuarios();
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(AplicacaoCliente.class.getName()).log(Level.SEVERE, null, ex);
+                if (chatClienteController.isConectado()) {
+                    /*
+                     atualiza as mensagens de log
+                     */
+                    atualizarTelaDeMensagens();
+                    atualizarTabelaDeUsuarios();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(AplicacaoCliente.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    System.out.println("debug: threa acha que chatClientController nao estao conectado");
                 }
             }
         }
@@ -183,6 +194,7 @@ public class AplicacaoCliente extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
