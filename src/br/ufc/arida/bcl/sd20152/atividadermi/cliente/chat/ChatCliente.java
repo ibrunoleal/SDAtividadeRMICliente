@@ -45,7 +45,7 @@ public class ChatCliente {
     }
 
     protected synchronized List<String> getMensagensDeLog() {
-        List<String> listaDeLogs = new ArrayList<>(mensagensDeLog);
+        List<String> listaDeLogs = new ArrayList<String>(mensagensDeLog);
         return listaDeLogs;
     }
     

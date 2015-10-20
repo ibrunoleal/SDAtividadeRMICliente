@@ -8,6 +8,8 @@ package br.ufc.arida.bcl.sd20152.atividadermi.cliente.chat;
 import br.ufc.arida.bcl.sd20152.atividadermi.lib.InterfaceDeCliente;
 import br.ufc.arida.bcl.sd20152.atividadermi.lib.InterfaceDeServidor;
 import br.ufc.arida.bcl.sd20152.atividadermi.lib.Mensagem;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -40,27 +42,33 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     public void entrarNoChat() {
         String log;
         if (!isConectado()) {
-           
-            try {
-                log = "registrando...";
-                registroCliente = LocateRegistry.getRegistry(InterfaceDeServidor.IP_DO_SERVIDOR, 1099);
-                adicionarRegistroDeLog(log);
-            } catch (RemoteException e) {
-                log = "erro: servidor nao encontrado para registro";
-                adicionarRegistroDeLog(log);
-                e.printStackTrace();
-                //System.exit(1);
-            }
+            String registryURL = "rmi://" + InterfaceDeServidor.IP_DO_SERVIDOR + ":" + InterfaceDeServidor.PORTA + "/" + InterfaceDeServidor.ID_DO_CHAT_RMI;
+//            try {
+//                log = "registrando...";
+//                registroCliente = LocateRegistry.getRegistry(registryURL);
+//                adicionarRegistroDeLog(log);
+//            } catch (RemoteException e) {
+//                log = "erro: servidor nao encontrado para registro";
+//                adicionarRegistroDeLog(log);
+//                e.printStackTrace();
+//                //System.exit(1);
+//            }
 
+            
             try {
                 log = "criando interface de comunicacao remota";
                 adicionarRegistroDeLog(log);
-                servidor = (InterfaceDeServidor) registroCliente.lookup(InterfaceDeServidor.ID_DO_CHAT_RMI);
+                //servidor = (InterfaceDeServidor) registroCliente.lookup(InterfaceDeServidor.ID_DO_CHAT_RMI);
+                servidor = (InterfaceDeServidor) Naming.lookup(registryURL);
                 log = "interface de comunicacao remota criada";
                 adicionarRegistroDeLog(log);
-            } catch (RemoteException | NotBoundException e) {
+            } catch (RemoteException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+            } catch (NotBoundException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(ChatClienteController.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             String nick = JOptionPane.showInputDialog("Digite um nickname para utilizar no chat:");
@@ -138,7 +146,7 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
         if (isConectado()) {
             List<String> lista;
             try {
-                lista = new ArrayList<>(servidor.getNicknamesDosUsuarios());
+                lista = new ArrayList<String>(servidor.getNicknamesDosUsuarios());
                 return lista;
             } catch (RemoteException ex) {
                 String log = "nao foi possivel recuperar a lista de nickname dos subscribers do chat.";
@@ -191,7 +199,7 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     }
     
     public boolean isConectado() {
-        if (registroCliente != null && servidor != null) {
+        if (servidor != null) {
             return true;
         } else {
             return false;
