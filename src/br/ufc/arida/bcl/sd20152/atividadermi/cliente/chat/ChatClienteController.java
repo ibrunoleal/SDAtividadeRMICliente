@@ -11,6 +11,7 @@ import br.ufc.arida.bcl.sd20152.atividadermi.lib.Mensagem;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -33,6 +34,11 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     
     private InterfaceDeServidor servidor;
     
+    private final String IP_DO_SERVIDOR = "localhost";
+    private final String PORTA = "1099";
+    private final String ID_DO_SERVICO = "chatrmi";
+    private final String registroRMI = "rmi://" + IP_DO_SERVIDOR + ":" + PORTA + "/" + ID_DO_SERVICO;
+    
     public ChatClienteController() throws RemoteException{
         chatCliente = new ChatCliente();
         registroCliente = null;
@@ -42,24 +48,13 @@ public class ChatClienteController  extends UnicastRemoteObject implements Inter
     public void entrarNoChat() {
         String log;
         if (!isConectado()) {
-            String registryURL = "rmi://" + InterfaceDeServidor.IP_DO_SERVIDOR + ":" + InterfaceDeServidor.PORTA + "/" + InterfaceDeServidor.ID_DO_CHAT_RMI;
-//            try {
-//                log = "registrando...";
-//                registroCliente = LocateRegistry.getRegistry(registryURL);
-//                adicionarRegistroDeLog(log);
-//            } catch (RemoteException e) {
-//                log = "erro: servidor nao encontrado para registro";
-//                adicionarRegistroDeLog(log);
-//                e.printStackTrace();
-//                //System.exit(1);
-//            }
-
+            
+            System.setProperty("java.rmi.server.hostname", IP_DO_SERVIDOR);
             
             try {
                 log = "criando interface de comunicacao remota";
                 adicionarRegistroDeLog(log);
-                //servidor = (InterfaceDeServidor) registroCliente.lookup(InterfaceDeServidor.ID_DO_CHAT_RMI);
-                servidor = (InterfaceDeServidor) Naming.lookup(registryURL);
+                servidor = (InterfaceDeServidor) Naming.lookup(registroRMI);
                 log = "interface de comunicacao remota criada";
                 adicionarRegistroDeLog(log);
             } catch (RemoteException e) {

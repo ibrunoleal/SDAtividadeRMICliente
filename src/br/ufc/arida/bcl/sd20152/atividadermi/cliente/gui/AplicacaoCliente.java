@@ -115,13 +115,11 @@ public class AplicacaoCliente extends javax.swing.JFrame {
                      */
                     atualizarTelaDeMensagens();
                     atualizarTabelaDeUsuarios();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(AplicacaoCliente.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                } else {
-                    System.out.println("debug: threa acha que chatClientController nao estao conectado");
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(AplicacaoCliente.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
